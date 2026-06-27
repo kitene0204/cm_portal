@@ -30,6 +30,10 @@
         <h1 id="app-title">창민의 웹앱 허브</h1>
       </div>
       <div class="header-right">
+        <div id="sync-status" class="sync-status" title="실시간 클라우드 동기화 상태">
+          <span class="status-indicator"></span>
+          <span class="status-text">동기화 로드 중</span>
+        </div>
         <button id="btn-settings" class="btn btn-secondary" title="설정">
           <i data-lucide="settings"></i>
           <span>설정</span>
@@ -275,6 +279,14 @@
 
         </main>
       </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-notification" class="toast-notification hidden">
+    <div class="toast-content">
+      <i id="toast-icon" data-lucide="cloud"></i>
+      <span id="toast-message">클라우드 동기화 완료</span>
     </div>
   </div>
 

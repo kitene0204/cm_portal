@@ -5,6 +5,7 @@
 // ==========================================================================
 
 const LOCAL_STORAGE_KEY = 'gemini_webapp_hub_state';
+const KVDB_BUCKET_URL = 'https://kvdb.io/N9q5Y2w9r1m4z3k7P5D8xG/cm_portal_data';
 
 let state = {
   pageTitle: '창민의 웹앱 허브',
@@ -122,6 +123,14 @@ function loadDefaults() {
       category: 'school',
       thumbnail: '',
       order: 2
+    },
+    {
+      id: '5',
+      title: '자동 슬라이드(PPT) 생성기',
+      url: 'https://canvas.gemini.google.com/slide-generator-placeholder',
+      category: 'school',
+      thumbnail: '',
+      order: 3
     }
   ];
 
@@ -133,8 +142,100 @@ function loadDefaults() {
   saveState();
 }
 
+// ==========================================================================
+// Cloud Sync & Toast Notification Helpers
+// ==========================================================================
+
+let toastTimeout;
+function showToast(message, type = 'success') {
+  if (!toastNotification || !toastMessage || !toastIcon) return;
+  if (toastTimeout) clearTimeout(toastTimeout);
+  
+  toastMessage.innerText = message;
+  toastNotification.classList.remove('hidden');
+  
+  if (type === 'error') {
+    toastIcon.setAttribute('data-lucide', 'alert-circle');
+  } else {
+    toastIcon.setAttribute('data-lucide', 'cloud');
+  }
+  initIcons();
+  
+  toastTimeout = setTimeout(() => {
+    toastNotification.classList.add('hidden');
+  }, 2500);
+}
+
+async function syncToCloud() {
+  if (!syncStatusEl || !syncIndicatorEl || !syncTextEl) return;
+  
+  syncIndicatorEl.className = 'status-indicator syncing';
+  syncTextEl.innerText = '동기화 중...';
+  
+  try {
+    const response = await fetch(KVDB_BUCKET_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(state)
+    });
+    
+    if (response.ok) {
+      syncIndicatorEl.className = 'status-indicator success';
+      syncTextEl.innerText = '동기화 완료';
+      showToast('클라우드 동기화 완료!');
+    } else {
+      throw new Error('Cloud response not OK');
+    }
+  } catch (error) {
+    console.error("Cloud Sync write failed:", error);
+    syncIndicatorEl.className = 'status-indicator error';
+    syncTextEl.innerText = '동기화 실패 (로컬 저장)';
+    showToast('클라우드 동기화 실패 (로컬 저장됨)', 'error');
+  }
+}
+
+async function loadFromCloud() {
+  if (!syncStatusEl || !syncIndicatorEl || !syncTextEl) return;
+  
+  syncIndicatorEl.className = 'status-indicator syncing';
+  syncTextEl.innerText = '동기화 로드 중...';
+  
+  try {
+    const response = await fetch(KVDB_BUCKET_URL);
+    if (response.ok) {
+      const cloudState = await response.json();
+      
+      if (cloudState && cloudState.apps) {
+        state = cloudState;
+        // Cache to local storage
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+        
+        // Re-render UI
+        renderUI();
+        
+        syncIndicatorEl.className = 'status-indicator success';
+        syncTextEl.innerText = '동기화 완료';
+        showToast('클라우드 데이터 연동 성공!');
+      }
+    } else if (response.status === 404) {
+      console.log("Cloud store empty. Initializing with local state...");
+      await syncToCloud();
+    } else {
+      throw new Error('Cloud response status: ' + response.status);
+    }
+  } catch (error) {
+    console.error("Cloud Sync load failed:", error);
+    syncIndicatorEl.className = 'status-indicator error';
+    syncTextEl.innerText = '오프라인 (로컬 데이터)';
+    showToast('클라우드 데이터 로드 실패 (로컬 로드)', 'error');
+  }
+}
+
 function saveState() {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+  syncToCloud();
 }
 
 // ==========================================================================
@@ -149,6 +250,14 @@ const appTitleEl = document.getElementById('app-title');
 const webappsContainer = document.getElementById('webapps-container');
 const emptyStateEl = document.getElementById('empty-state');
 const settingsModal = document.getElementById('settings-modal');
+
+// Cloud Sync & Toast Elements
+const syncStatusEl = document.getElementById('sync-status');
+const syncIndicatorEl = syncStatusEl?.querySelector('.status-indicator');
+const syncTextEl = syncStatusEl?.querySelector('.status-text');
+const toastNotification = document.getElementById('toast-notification');
+const toastMessage = document.getElementById('toast-message');
+const toastIcon = document.getElementById('toast-icon');
 
 // Settings Form Fields
 const inputPageTitle = document.getElementById('input-page-title');
@@ -687,11 +796,15 @@ function bindEvents() {
 }
 
 // Entrypoint
-function init() {
+async function init() {
+  // 1. Load from local cache immediately for fast initial rendering
   loadState();
   bindEvents();
   setupModalTabs();
   renderUI();
+  
+  // 2. Fetch latest data from cloud asynchronously
+  await loadFromCloud();
 }
 
 window.addEventListener('DOMContentLoaded', init);
