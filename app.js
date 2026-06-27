@@ -5,7 +5,7 @@
 // ==========================================================================
 
 const LOCAL_STORAGE_KEY = 'gemini_webapp_hub_state';
-const KVDB_BUCKET_URL = 'https://kvdb.io/N9q5Y2w9r1m4z3k7P5D8xG/cm_portal_data';
+const KVDB_BUCKET_URL = 'https://kvdb.io/NLaSVGy1qZviT2sPLomUpd/portal_data';
 
 let state = {
   pageTitle: '창민의 웹앱 허브',
