@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini WebApp Hub</title>
+  <!-- Google Fonts: Plus Jakarta Sans for body, Outfit for headers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-glass-dark">
+  <div class="background-decorations">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="header-left">
+        <div class="logo-icon">
+          <i data-lucide="layout-grid"></i>
+        </div>
+        <h1 id="app-title">창민의 웹앱 허브</h1>
+      </div>
+      <div class="header-right">
+        <button id="btn-settings" class="btn btn-secondary" title="설정">
+          <i data-lucide="settings"></i>
+          <span>설정</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-navigation">
+      <button class="tab-btn active" data-tab="personal">
+        <i data-lucide="user"></i>
+        창민 개인
+      </button>
+      <button class="tab-btn" data-tab="school">
+        <i data-lucide="graduation-cap"></i>
+        학교
+      </button>
+    </nav>
+
+    <!-- WebApp Content Area -->
+    <main class="content-area">
+      <div id="webapps-container" class="layout-grid">
+        <!-- WebApp Cards will be rendered dynamically here -->
+      </div>
+      
+      <!-- Empty state when no apps are present in tab -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon">
+          <i data-lucide="folder-open"></i>
+        </div>
+        <h3>등록된 웹앱이 없습니다</h3>
+        <p>설정창을 열어 새로운 웹앱을 추가해보세요!</p>
+        <button id="btn-empty-add" class="btn btn-primary">
+          <i data-lucide="plus"></i>웹앱 추가하기
+        </button>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <p>&copy; 2026 Gemini WebApp Hub. Created for Changmin & Students.</p>
+    </footer>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <header class="modal-header">
+        <h2><i data-lucide="sliders"></i> 허브 설정</h2>
+        <button id="btn-close-settings" class="modal-close-btn">
+          <i data-lucide="x"></i>
+        </button>
+      </header>
+      
+      <div class="modal-body">
+        <!-- Left Sidebar inside modal for sections -->
+        <aside class="modal-sidebar">
+          <button class="sidebar-tab active" data-section="sec-general">
+            <i data-lucide="settings-2"></i>일반 설정
+          </button>
+          <button class="sidebar-tab" data-section="sec-design">
+            <i data-lucide="palette"></i>테마 & 레이아웃
+          </button>
+          <button class="sidebar-tab" data-section="sec-manage">
+            <i data-lucide="plus-circle"></i>웹앱 추가/수정
+          </button>
+          <button class="sidebar-tab" data-section="sec-list">
+            <i data-lucide="list-ordered"></i>웹앱 순서/관리
+          </button>
+        </aside>
+
+        <!-- Right Content Panels -->
+        <main class="modal-panels">
+          
+          <!-- Panel 1: General Settings -->
+          <section id="sec-general" class="modal-panel active">
+            <h3>일반 설정</h3>
+            <div class="form-group">
+              <label for="input-page-title">페이지 이름 (타이틀)</label>
+              <input type="text" id="input-page-title" placeholder="예: 창민의 웹앱 허브">
+              <small class="form-help">메인 화면 좌측 상단에 표시되는 대제목입니다.</small>
+            </div>
+            <button id="btn-save-general" class="btn btn-primary">적용하기</button>
+          </section>
+
+          <!-- Panel 2: Theme & Layout Settings -->
+          <section id="sec-design" class="modal-panel">
+            <h3>디자인 레이아웃</h3>
+            <div class="layout-selector-grid">
+              <label class="layout-option">
+                <input type="radio" name="layout-choice" value="grid" checked>
+                <div class="layout-card">
+                  <div class="layout-preview-icon"><i data-lucide="grid"></i></div>
+                  <span>그리드 카드 뷰</span>
+                  <small>썸네일을 크게 보여주는 전통적인 바둑판식 배열</small>
+                </div>
+              </label>
+              <label class="layout-option">
+                <input type="radio" name="layout-choice" value="list">
+                <div class="layout-card">
+                  <div class="layout-preview-icon"><i data-lucide="list"></i></div>
+                  <span>가로 리스트 뷰</span>
+                  <small>한 줄씩 넓게 배치되어 링크 정보 가독성 중심</small>
+                </div>
+              </label>
+              <label class="layout-option">
+                <input type="radio" name="layout-choice" value="compact">
+                <div class="layout-card">
+                  <div class="layout-preview-icon"><i data-lucide="layout-grid"></i></div>
+                  <span>컴팩트 뷰</span>
+                  <small>썸네일을 최소화하여 한 눈에 여러 앱을 모아보는 뷰</small>
+                </div>
+              </label>
+            </div>
+
+            <h3 class="margin-top-lg">디자인 테마 선택</h3>
+            <div class="theme-selector-grid">
+              <label class="theme-option theme-glass-dark">
+                <input type="radio" name="theme-choice" value="theme-glass-dark" checked>
+                <div class="theme-card">
+                  <div class="theme-color-dots">
+                    <span style="background: #0f172a;"></span>
+                    <span style="background: #3b82f6;"></span>
+                    <span style="background: #8b5cf6;"></span>
+                  </div>
+                  <span>Glass Dark (기본)</span>
+                </div>
+              </label>
+              <label class="theme-option theme-emerald-school">
+                <input type="radio" name="theme-choice" value="theme-emerald-school">
+                <div class="theme-card">
+                  <div class="theme-color-dots">
+                    <span style="background: #064e3b;"></span>
+                    <span style="background: #10b981;"></span>
+                    <span style="background: #f59e0b;"></span>
+                  </div>
+                  <span>Emerald School</span>
+                </div>
+              </label>
+              <label class="theme-option theme-sunset-violet">
+                <input type="radio" name="theme-choice" value="theme-sunset-violet">
+                <div class="theme-card">
+                  <div class="theme-color-dots">
+                    <span style="background: #2e1065;"></span>
+                    <span style="background: #ec4899;"></span>
+                    <span style="background: #f43f5e;"></span>
+                  </div>
+                  <span>Sunset Violet</span>
+                </div>
+              </label>
+              <label class="theme-option theme-minimal-light">
+                <input type="radio" name="theme-choice" value="theme-minimal-light">
+                <div class="theme-card">
+                  <div class="theme-color-dots">
+                    <span style="background: #f8fafc;"></span>
+                    <span style="background: #0f172a;"></span>
+                    <span style="background: #64748b;"></span>
+                  </div>
+                  <span>Minimal Light</span>
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <!-- Panel 3: Add & Edit WebApp Form -->
+          <section id="sec-manage" class="modal-panel">
+            <h3 id="form-action-title">새로운 웹앱 추가</h3>
+            <form id="webapp-form" onsubmit="return false;">
+              <input type="hidden" id="edit-app-id" value="">
+              
+              <div class="form-group">
+                <label for="app-name">웹앱 이름</label>
+                <input type="text" id="app-name" required placeholder="예: 수학 공식 연습 마스터">
+              </div>
+
+              <div class="form-group">
+                <label for="app-url">웹앱 주소 (URL)</label>
+                <input type="url" id="app-url" required placeholder="https://canvas.gemini.google.com/...">
+              </div>
+
+              <div class="form-group">
+                <label>탭 구분 (카테고리)</label>
+                <div class="radio-group-tabs">
+                  <label class="category-radio">
+                    <input type="radio" name="app-category" value="personal" checked>
+                    <span>창민 개인</span>
+                  </label>
+                  <label class="category-radio">
+                    <input type="radio" name="app-category" value="school">
+                    <span>학교</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>썸네일 업로드</label>
+                <div class="thumbnail-upload-container">
+                  <div class="thumbnail-preview-box" id="thumbnail-preview-box">
+                    <i data-lucide="image"></i>
+                    <span>미리보기 없음</span>
+                  </div>
+                  <div class="upload-controls">
+                    <button type="button" id="btn-trigger-upload" class="btn btn-secondary btn-sm">
+                      <i data-lucide="upload"></i> 이미지 파일 업로드
+                    </button>
+                    <input type="file" id="app-thumbnail-file" accept="image/*" class="hidden">
+                    <button type="button" id="btn-use-placeholder" class="btn btn-text btn-sm">
+                      기본 단색 그라데이션 사용
+                    </button>
+                    <input type="hidden" id="app-thumbnail-data" value="">
+                  </div>
+                </div>
+                <small class="form-help">이미지 파일을 직접 업로드하여 지정하거나, 미지정시 예쁜 랜덤 그라데이션이 적용됩니다.</small>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" id="btn-save-app" class="btn btn-primary">
+                  <i data-lucide="save"></i> 저장하기
+                </button>
+                <button type="button" id="btn-cancel-edit" class="btn btn-secondary hidden">
+                  취소
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Panel 4: WebApp Ordering and List Management -->
+          <section id="sec-list" class="modal-panel">
+            <h3>웹앱 순서 변경 & 삭제</h3>
+            <p class="section-desc">탭 별로 등록된 웹앱의 순서를 위/아래 버튼을 이용해 조정하거나 편집 및 삭제할 수 있습니다.</p>
+            
+            <div class="management-tabs">
+              <button class="manage-tab-btn active" data-manage-tab="personal">개인 목록</button>
+              <button class="manage-tab-btn" data-manage-tab="school">학교 목록</button>
+            </div>
+
+            <div class="app-list-table-wrapper">
+              <ul id="manage-app-list" class="manage-app-list">
+                <!-- Javascript will inject list items here -->
+              </ul>
+            </div>
+          </section>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+</body>
+</html>
